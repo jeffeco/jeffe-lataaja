@@ -1,0 +1,59 @@
+.downloadBtn {
+  position: absolute;
+  right: 25px;
+  top: 25px;
+  z-index: 2;
+  opacity: 0;
+  height: 28px;
+  padding: 0 8px;
+  line-height: 26px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  outline: none;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  transition: opacity .1s ease-out;
+  transition-delay: .1s;
+  border-radius: 3px;
+  background: linear-gradient(130deg, rgb(255, 85, 85) 0%, rgb(216, 56, 234) 100%);
+  border: 0px solid transparent;
+}
+
+.downloadBtn.inStories {
+  width: auto;
+  top: 10px;
+  right: 10px;
+  font-size: 12px;
+}
+
+/*
+  .KL4Bh: IMG parent
+  .OAXCp: VIDEO parent
+  .qbCDp: Stories prev
+ */
+.KL4Bh:hover .downloadBtn,
+.OAXCp:hover .downloadBtn,
+.qbCDp:hover ~ .downloadBtn {
+  opacity: 1;
+}
+
+.KL4Bh:active .downloadBtn,
+.OAXCp:active .downloadBtn {
+  opacity: .9;
+}
+
+/* pic cover */
+._si7dy,
+._9AhH0 {
+  display: none !important;
+}
+
+/* Top Bar ._lz6s zIndex > .downloadBtn zIndex */
+._lz6s {
+  z-index: 3 !important;
+}
