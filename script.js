@@ -98,7 +98,6 @@ if (window.location.pathname.includes('watch')) {
         document.querySelector("#contentWrapper > ytd-menu-popup-renderer").style.overflow = "unset"
 
         document.querySelector('.bossi').addEventListener('click', () => {
-          console.log("*JUUU")
           document.querySelector(".kkonaa").style.display = "block"
           document.querySelector(".kuva").style.display = "none"
 
@@ -119,7 +118,6 @@ chrome.storage.sync.get({
         if (document.querySelector("[aria-label='Lisää toimintoja']")) {
           clearInterval(allah3)
           document.querySelector("[aria-label='Lisää toimintoja']").addEventListener('click', () => {
-            console.log('allah')
 
             if (!document.querySelector(".kkonaa")) return allah()
           })
@@ -279,7 +277,14 @@ function findMedia(box, way) {
 
 
     if (event.target.className.indexOf('fXIG0') >= 0) {
+      let im_postor
       _parent = event.target.parentNode;
+      try {
+
+        im_postor = _parent.parentNode.parentNode.parentNode.querySelector('.c-Yi7').href
+      } catch (err) {
+        console.log(err, "sus😳😳😳😳😳😳😳😳😳😳😳😳😳😳😳😳😳😳😳")
+      }
       _url = _parent.querySelector('.tWeCl').src;
       _username = '';
 
@@ -288,7 +293,7 @@ function findMedia(box, way) {
         _username = _parent.parents('article')[0].querySelector('.sqdOP').text;
       }
 
-      addBtn(_parent, _url, _username);
+      addBtn(_parent, _url, _username, im_postor);
     }
 
     /*
@@ -345,7 +350,7 @@ function findMedia(box, way) {
   });
 }
 
-function addBtn(parent, url, username) {
+function addBtn(parent, url, username, postUrl) {
   var _parent = parent;
   var _url = url;
   var _url_param = url.indexOf('?') >= 0 ? url.substring(0, url.indexOf('?')) : url;
@@ -368,12 +373,45 @@ function addBtn(parent, url, username) {
   _btn.addEventListener('click', function(event) {
     event.stopPropagation();
 
+    if (postUrl) {
+      fetch(`${postUrl}?__a=1`).then(a => {
+        a.json().then(a => {
+          if (a.graphql.shortcode_media) {
+            //VIDEO
+            const videoUrl = a.graphql.shortcode_media.video_url
+
+            // Download
+            chrome.runtime.sendMessage({
+              msg: 'DL',
+              url: videoUrl,
+              filename: _filename + '.mp4'
+            });
+          } else {
+            // KUVA
+
+            chrome.runtime.sendMessage({
+              msg: 'DL',
+              url: _url,
+              filename: _filename
+            });
+          }
+        })
+      })
+
+    } else {
+      chrome.runtime.sendMessage({
+        msg: 'DL',
+        url: _url,
+        filename: _filename
+      });
+    }
+
     // Download
-    chrome.runtime.sendMessage({
-      msg: 'DL',
-      url: _url,
-      filename: _filename
-    });
+    // chrome.runtime.sendMessage({
+    //   msg: 'DL',
+    //   url: _url,
+    //   filename: _filename
+    // });
   }, false);
 
   // Check options(AlwaysHide)
