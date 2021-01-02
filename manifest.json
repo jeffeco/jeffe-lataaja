@@ -28,6 +28,7 @@
   ],
 
   "permissions": [
+    "tabs",
     "downloads",
     "storage",
     "http://www.instagram.com/*",
