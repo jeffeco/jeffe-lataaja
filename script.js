@@ -22,6 +22,37 @@ Element.prototype.parents = function(selector) {
   return elements;
 };
 
+function debu(title, msg, cons) {
+
+  chrome.storage.sync.get({
+    debug: false
+  }, function(items) {
+    if (items.debug) {
+      if (cons) {
+        if (cons.errMsg) {
+          SimpleNotification.error({
+            title: title,
+            text: msg,
+            duration: 18000
+          })
+
+          return console.log('[DEBUG] [ERROR] ', cons)
+        }
+      }
+
+      SimpleNotification.info({
+        title: title,
+        text: msg,
+        duration: 12000
+      })
+
+      if (cons) {
+        console.log('[DEBUG] ', cons)
+      }
+    }
+  });
+}
+
 /*
   Main
 */
@@ -241,6 +272,7 @@ function findMedia(box, way) {
 
   _box.addEventListener('mouseover', function(event) {
 
+
     if (!event.target) return
     if (!event.target.className) return
     if (!event.target.className.indexOf) return
@@ -281,7 +313,15 @@ function findMedia(box, way) {
       _parent = event.target.parentNode;
       try {
 
-        im_postor = _parent.parentNode.parentNode.parentNode.querySelector('.c-Yi7').href
+        if (_parent.parentNode.parentNode.parentNode.querySelector('.c-Yi7')) {
+          im_postor = _parent.parentNode.parentNode.parentNode.querySelector('.c-Yi7').href
+        } else {
+          if (window.location.pathname.split('/')[1].includes('p')) {
+            im_postor = window.location.pathname
+          }
+        }
+
+
       } catch (err) {
         console.log(err, "sus😳😳😳😳😳😳😳😳😳😳😳😳😳😳😳😳😳😳😳")
       }
@@ -364,6 +404,7 @@ function addBtn(parent, url, username, postUrl) {
   _btn.type = 'button';
   _btn.innerText = "Lataa"
 
+
   if (window.location.pathname.match('/stories/')) {
     _btn.className = 'downloadBtn inStories';
   } else {
@@ -371,12 +412,19 @@ function addBtn(parent, url, username, postUrl) {
   }
 
   _btn.addEventListener('click', function(event) {
+    debu('event click', 'Nappia painettu. Consoles lisää', {event})
+
     event.stopPropagation();
 
+
+
+    debu('Fetch', `Aloitettu! URL: ${postUrl}`)
     if (postUrl) {
       fetch(`${postUrl}?__a=1`).then(a => {
         a.json().then(a => {
-          if (a.graphql.shortcode_media) {
+          debu('Fetch', 'onnistui data consolessa', {json: a})
+          if (a.graphql.shortcode_media.video_url) {
+            debu('Yksi video', 'a.graphql.shortcode_media.video_url on true')
             //VIDEO
             const videoUrl = a.graphql.shortcode_media.video_url
 
@@ -386,7 +434,37 @@ function addBtn(parent, url, username, postUrl) {
               url: videoUrl,
               filename: _filename + '.mp4'
             });
+          } else if (a.graphql.shortcode_media.edge_sidecar_to_children?.edges) {
+            debu('Monta videota', 'a.graphql.shortcode_media.edge_sidecar_to_children?.edges on true')
+
+            const display_url =  parent.querySelector('.tWeCl').poster
+
+            try {
+              const videoUrlsUnfiltered = a.graphql.shortcode_media.edge_sidecar_to_children.edges.map(video => {
+                console.log(video, video.node?.display_url == display_url)
+                if (video.node?.display_url == display_url) {
+                  return video.node.video_url
+                }
+              })
+
+              const videoUrl = videoUrlsUnfiltered.filter(a => a !== undefined)
+
+              const osoite = videoUrl[0]
+
+              debu('Lataus', 'Videoa ladataan!', { osoite })
+
+              chrome.runtime.sendMessage({
+                msg: 'DL',
+                url: osoite,
+                filename: _filename + '.mp4'
+              });
+
+            } catch (err) {
+              debu('ERROR', 'Videon sijainnissa virhe consoles lisää', {error: err, msg: '437 ORAVATALO', errMsg: true})
+            }
+
           } else {
+            debu('Lataus', 'Se onpi kuva')
             // KUVA
 
             chrome.runtime.sendMessage({
@@ -399,6 +477,7 @@ function addBtn(parent, url, username, postUrl) {
       })
 
     } else {
+      debu('Lataus', 'POSTURL false kaikki kusi toisinsanotusti tai juttu jota ladataaan on vaan kuva')
       chrome.runtime.sendMessage({
         msg: 'DL',
         url: _url,

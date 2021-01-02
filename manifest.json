@@ -3,7 +3,7 @@
 
   "name": "JEFFe Lataaja",
   "description": "Lataa instagramista videoita ja kuvia",
-  "version": "69.42.05",
+  "version": "69.42.06",
 
   "browser_action": {
     "default_icon": "icons/icon-16x16.png"
@@ -21,8 +21,8 @@
 
   "content_scripts": [
     {
-      "js": ["script.js"],
-      "css": ["style.css"],
+      "js": ["notification/simpleNotification.js", "script.js"],
+      "css": ["notification/simpleNotification.css", "style.css"],
       "matches": ["*://*.instagram.com/*", "*://*.youtube.com/*"]
     }
   ],
