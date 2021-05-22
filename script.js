@@ -276,6 +276,8 @@ function findMedia(box, way) {
     if (!event.target) return
     if (!event.target.className) return
     if (!event.target.className.indexOf) return
+
+    console.log(event.target.className, _parent)
     /*
       Picture
 
